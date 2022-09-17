@@ -11,16 +11,8 @@ func positionInfo(forNode node: XNode?) -> String? {
 @available(macOS 10.15, *)
 public extension Execution {
     
-    func log(_ message: Message, node: XNode?, _ arguments: String...) async -> () {
-        await log(message: message, itemPositionInfo: positionInfo(forNode: node), arguments: arguments)
-    }
-    
-}
-
-public extension SynchronousCollectingLogger {
-    
     func log(_ message: Message, node: XNode?, _ arguments: String...) -> () {
-        self.log(message: message, itemPositionInfo: positionInfo(forNode: node), arguments: arguments)
+        log(message: message, itemPositionInfo: positionInfo(forNode: node), arguments: arguments)
     }
     
 }
