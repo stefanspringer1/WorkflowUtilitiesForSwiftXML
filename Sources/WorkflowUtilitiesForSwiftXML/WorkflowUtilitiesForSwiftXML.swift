@@ -12,7 +12,7 @@ func positionInfo(forNode node: XNode?) -> String? {
 public extension Execution {
     
     func log(_ message: Message, node: XNode?, _ arguments: String...) -> () {
-        log(message: message, itemPositionInfo: positionInfo(forNode: node), arguments: arguments)
+        log(message, itemPositionInfo: positionInfo(forNode: node), withArguments: arguments)
     }
     
 }
