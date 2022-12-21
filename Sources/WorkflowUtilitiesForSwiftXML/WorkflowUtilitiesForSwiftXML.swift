@@ -5,7 +5,7 @@ import Workflow
 
 @inline(__always)
 func positionInfo(forNode node: XNode?) -> String? {
-    return (node as? XElement)?.xpath ?? node?.parent?.xpath
+    return (node as? XElement)?.xPath ?? node?.parent?.xPath
 }
 
 public extension Execution {
