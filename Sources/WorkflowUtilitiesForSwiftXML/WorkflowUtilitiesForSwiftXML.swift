@@ -11,7 +11,7 @@ func positionInfo(forNode node: XNode?) -> String? {
 public extension Execution {
     
     func log(_ message: Message, node: XNode?, _ arguments: String...) -> () {
-        log(message, itemPositionInfo: positionInfo(forNode: node), withArguments: arguments)
+        log(message, itemPositionInfo: positionInfo(forNode: node)?.appending(node?.description.prepending(" (").appending(")")) , withArguments: arguments)
     }
     
 }
