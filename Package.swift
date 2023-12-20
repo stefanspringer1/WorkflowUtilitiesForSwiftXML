@@ -19,8 +19,8 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/stefanspringer1/SwiftXML", from: "1.2.338"),
-        .package(url: "https://github.com/stefanspringer1/SwiftWorkflow", from: "1.2.198"),
+        .package(url: "https://github.com/stefanspringer1/SwiftXML", from: "1.2.367"),
+        .package(url: "https://github.com/stefanspringer1/SwiftWorkflow", from: "1.2.202"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
