@@ -11,9 +11,15 @@ func positionInfo(forNode node: XNode?) -> String? {
 public extension XElement {
     
     /// Use this extension to `XElement` to set the attachments `xpath` and `element` to be used for error messages.
-    func setElementInfo() {
+    /// If `forWholeSubtree: true` is set, the same is done for all descendants.
+    func setElementInfo(forWholeSubtree: Bool = false) {
         if self.attached["xpath"] == nil { self.attached["xpath"] = self.xPath }
         if self.attached["element"] == nil { self.attached["element"] = self.description }
+        if forWholeSubtree {
+            for element in self.descendants {
+                element.setElementInfo()
+            }
+        }
     }
     
 }
@@ -21,7 +27,7 @@ public extension XElement {
 /// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath
 /// and (optionally) for the attachment of name `element` for the description for the element up in the tree
 /// (including the node itself) before constructing an informatuion based on the current tree.
-///  You might use the extension `setElementInfo()` to `XElement` to set those attachments in the application.
+///  You might use the extension `setElementInfo(forWholeSubtree:)` to `XElement` to set those attachments in the application.
 func itemPositionInfo(for node: XNode?) -> String? {
     node?.ancestorsIncludingSelf.compactMap{ ($0.attached["xpath"] as? String)?.appending(($0.attached["element"] as? String)?.prepending(" (").appending(")")) }.first ??
     positionInfo(forNode: node)?.appending(((node as? XText)?.parent ?? node)?.description.prepending(" (").appending(")"))
