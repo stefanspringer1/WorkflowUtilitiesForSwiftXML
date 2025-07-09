@@ -19,7 +19,7 @@ let package = Package(
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
-        .package(url: "https://github.com/stefanspringer1/SwiftXML", from: "5.0.0"),
+        .package(url: "https://github.com/stefanspringer1/SwiftXML", from: "6.0.0"),
         .package(url: "https://github.com/stefanspringer1/SwiftWorkflow", from: "4.1.7"),
     ],
     targets: [
