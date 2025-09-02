@@ -31,7 +31,7 @@ public extension XElement {
 func itemPositionInfo(for node: XNode?) -> String? {
     node?.ancestorsIncludingSelf.compactMap{ ($0.attached["xpath"] as? String)?.appending(($0.attached["element"] as? String)?.prepending(" (").appending(")")) }.first ??
     positionInfo(forNode: node)?.appending(((node as? XText)?.parent ?? node)?.description.prepending(" (")
-        .appending(((node is XText ? nil : node?.parent)?.description.prepending(" in "))).appending(")"))
+        .appending((node is XText ? nil : node?.parent)?.description.prepending(" in ")).appending(")"))
 }
 
 public extension Execution {
