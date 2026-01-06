@@ -40,9 +40,11 @@ public extension Execution {
         log(message, itemPositionInfo: itemPositionInfo(for: node), withArguments: arguments)
     }
     
-    func log(setPIWithTarget piTarget: String, _ message: Message, node: XNode?, _ arguments: String...) {
+    func log(setPIWithTarget piTarget: String?, _ message: Message, node: XNode?, _ arguments: String...) {
         let info = logAndUseInfo(message, itemPositionInfo: itemPositionInfo(for: node), withArguments: arguments)
-        (node as? XElement)?.addFirst { XProcessingInstruction(target: piTarget, data: "'\(info)'") }
+        if let piTarget {
+            (node as? XElement)?.addFirst { XProcessingInstruction(target: piTarget, data: "'\(info)'") }
+        }
     }
     
     func logAndUseInfo(_ message: Message, node: XNode?, _ arguments: String...) -> String {
