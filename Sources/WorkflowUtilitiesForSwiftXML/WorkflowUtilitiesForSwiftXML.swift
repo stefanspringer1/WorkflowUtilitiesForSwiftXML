@@ -36,19 +36,31 @@ func itemPositionInfo(for node: XNode?) -> String? {
 
 public extension Execution {
     
-    func log(_ message: Message, node: XNode?, _ arguments: String...) {
+    func log(_ message: Message, node: XNode?, _ arguments: [String]) {
         log(message, itemPositionInfo: itemPositionInfo(for: node), withArguments: arguments)
     }
     
-    func log(setPIWithTarget piTarget: String?, _ message: Message, node: XNode?, _ arguments: String...) {
+    func log(_ message: Message, node: XNode?, _ arguments: String...) {
+        log(message, node: node, arguments)
+    }
+    
+    func log(setPIWithTarget piTarget: String?, _ message: Message, node: XNode?, _ arguments: [String]) {
         let info = logAndUseInfo(message, itemPositionInfo: itemPositionInfo(for: node), withArguments: arguments)
         if let piTarget {
             (node as? XElement)?.addFirst { XProcessingInstruction(target: piTarget, data: "'\(info)'") }
         }
     }
     
-    func logAndUseInfo(_ message: Message, node: XNode?, _ arguments: String...) -> String {
+    func log(setPIWithTarget piTarget: String?, _ message: Message, node: XNode?, _ arguments: String...) {
+        log(setPIWithTarget: piTarget, message, node: node, arguments)
+    }
+    
+    func logAndUseInfo(_ message: Message, node: XNode?, _ arguments: [String]) -> String {
         logAndUseInfo(message, itemPositionInfo: itemPositionInfo(for: node), withArguments: arguments)
+    }
+    
+    func logAndUseInfo(_ message: Message, node: XNode?, _ arguments: String...) -> String {
+        logAndUseInfo(message, node: node, arguments)
     }
     
 }
