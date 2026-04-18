@@ -12,9 +12,9 @@ public extension XElement {
     
     /// Use this extension to `XElement` to set the attachments `xpath` and `element` to be used for error messages.
     /// If `forWholeSubtree: true` is set, the same is done for all descendants.
-    func setElementInfo(forWholeSubtree: Bool = false) {
-        if self.attached["xpath"] == nil { self.attached["xpath"] = self.xPath }
-        if self.attached["element"] == nil { self.attached["element"] = self.description }
+    func setElementInfo(from other: XElement? = nil, forWholeSubtree: Bool = false) {
+        if self.attached["xpath"] == nil { self.attached["xpath"] = (other ?? self).xPath }
+        if self.attached["element"] == nil { self.attached["element"] = (other ?? self).description }
         if forWholeSubtree {
             for element in self.descendants {
                 element.setElementInfo()
