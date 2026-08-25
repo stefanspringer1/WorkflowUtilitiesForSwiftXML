@@ -8,45 +8,47 @@ func positionInfo(forNode node: XNode?) -> String? {
     (node as? XElement)?.xPath ?? node?.parent?.xPath
 }
 
+fileprivate let elementInfoAttachmentName = "element-info"
+
 public extension XElement {
     
-    /// Use this extension to `XElement` to set the attachments `xpath` to be used for error messages.
-    /// If `usingAsXPathBarrier`, the XPath for any if its descendants will stop there.
+    /// Use this extension to `XElement` to set the attachments `xpath` and the element description to be used for error messages.
+    /// If `useForElementInfo`, the XPath for any if its descendants will stop there.
     func setElementInfo(xPath: String? = nil, from other: XElement? = nil) {
-        self.attached["xpath"] = xPath ?? (other ?? self).xPathConsideringAttached
+        self.attached["xpath"] = xPath ?? self.attached["xpath"] ?? (other ?? self).xPathConsideringAttached
+        self.attached["element"] = self.attached["element"] ?? "\(other ?? self)"
     }
     
-    func useAsXPathBarrier() {
-        self.attached["xpath-barrier"] = true
+    func useForElementInfo() {
+        self.attached[elementInfoAttachmentName] = true
     }
     
     func copyElementInfo(from other: XElement) {
         self.attached["xpath"] = other.attached["xpath"]
-        self.attached["xpath-barrier"] = other.attached["xpath-barrier"]
+        self.attached["element"] = other.attached["element"]
+        self.attached[elementInfoAttachmentName] = other.attached[elementInfoAttachmentName]
     }
     
 }
 
-public extension XNode {
+public extension XElement {
     
-    var xPathConsideringAttached: String? {
-        guard let element = self as? XElement ?? self.parent else { return nil }
-        if let ancestorWithSavedXPath = self.ancestorsIncludingSelf.filter({ ($0.attached["xpath"] as? String != nil) }).first, let relativePath = element.xPath(relativeTo: ancestorWithSavedXPath) {
+    var xPathConsideringAttached: String {
+        if let ancestorWithSavedXPath = self.ancestorsIncludingSelf.filter({ ($0.attached["xpath"] as? String != nil) }).first, let relativePath = self.xPath(relativeTo: ancestorWithSavedXPath) {
             return "\(ancestorWithSavedXPath.attached["xpath"] as? String ?? "?")\(relativePath == "." ? "" : "/\(relativePath)")"
         }
         else {
-            return element.xPath
+            return self.xPath
         }
     }
+}
+
+public extension XNode {
     
     /// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath.
     var positionInfo: String? {
-        guard let xPath = (self.ancestors.reversed().filter{ $0.attached["xpath-barrier"] as? Bool == true }.first ?? self).xPathConsideringAttached else { return nil }
-        if xPath.hasPrefix("/") {
-            return "\(self) (\(xPath))"
-        } else {
-            return "\(self)"
-        }
+        guard let element = self.ancestors.reversed().filter({ $0.attached[elementInfoAttachmentName] as? Bool == true }).first ?? self as? XElement ?? self.parent else { return nil }
+        return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? "\(element)"))"
     }
 }
 
