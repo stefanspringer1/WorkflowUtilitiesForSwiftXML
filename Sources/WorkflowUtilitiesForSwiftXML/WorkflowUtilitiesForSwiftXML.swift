@@ -43,9 +43,9 @@ public extension XNode {
     var positionInfo: String? {
         guard let xPath = (self.ancestors.reversed().filter{ $0.attached["xpath-barrier"] as? Bool == true }.first ?? self).xPathConsideringAttached else { return nil }
         if xPath.hasPrefix("/") {
-            return " (\(xPath))"
+            return "\(self) (\(xPath))"
         } else {
-            return nil
+            return "\(self)"
         }
     }
 }
