@@ -43,7 +43,7 @@ public extension XNode {
 /// (including the node itself) before constructing an informatuion based on the current tree.
 ///  You might use the extension `setElementInfo(forWholeSubtree:)` to `XElement` to set those attachments in the application.
 func itemPositionInfo(for node: XNode?) -> String? {
-    guard let xPath = node?.xPathConsideringAttached else { return nil }
+    guard let xPath = (node?.ancestors.reversed().filter{ $0.attached["xpath-barrier"] as? Bool == true }.first ?? node)?.xPathConsideringAttached else { return nil }
     if xPath.hasPrefix("/") {
         return " (\(xPath))"
     } else {
