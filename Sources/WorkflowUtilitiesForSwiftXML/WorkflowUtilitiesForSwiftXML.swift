@@ -12,7 +12,7 @@ public extension XElement {
     
     /// Use this extension to `XElement` to set the attachments `xpath` to be used for error messages.
     /// If `usingAsXPathBarrier`, the XPath for any if its descendants will stop there.
-    func setElementInfo(from other: XElement?, usingAsXPathBarrier: Bool = false) {
+    func setElementInfo(from other: XElement? = nil, usingAsXPathBarrier: Bool = false) {
         self.attached["xpath"] = (other ?? self).xPathConsideringAttached
         if usingAsXPathBarrier {
             self.attached["xpath-barrier"] = true
