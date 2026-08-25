@@ -12,11 +12,17 @@ public extension XElement {
     
     /// Use this extension to `XElement` to set the attachments `xpath` to be used for error messages.
     /// If `usingAsXPathBarrier`, the XPath for any if its descendants will stop there.
-    func setElementInfo(from other: XElement? = nil, usingAsXPathBarrier: Bool = false) {
-        self.attached["xpath"] = (other ?? self).xPathConsideringAttached
-        if usingAsXPathBarrier {
-            self.attached["xpath-barrier"] = true
-        }
+    func setElementInfo(xPath: String? = nil, from other: XElement? = nil) {
+        self.attached["xpath"] = xPath ?? (other ?? self).xPathConsideringAttached
+    }
+    
+    func useAsXPathBarrier() {
+        self.attached["xpath-barrier"] = true
+    }
+    
+    func copyElementInfo(from other: XElement) {
+        self.attached["xpath"] = other.attached["xpath"]
+        self.attached["xpath-barrier"] = other.attached["xpath-barrier"]
     }
     
 }
@@ -33,25 +39,21 @@ public extension XNode {
         }
     }
     
-}
-
-/// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath
-/// and (optionally) for the attachment of name `element` for the description for the element up in the tree
-/// (including the node itself) before constructing an informatuion based on the current tree.
-///  You might use the extension `setElementInfo(forWholeSubtree:)` to `XElement` to set those attachments in the application.
-func itemPositionInfo(for node: XNode?) -> String? {
-    guard let xPath = (node?.ancestors.reversed().filter{ $0.attached["xpath-barrier"] as? Bool == true }.first ?? node)?.xPathConsideringAttached else { return nil }
-    if xPath.hasPrefix("/") {
-        return " (\(xPath))"
-    } else {
-        return nil
+    /// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath.
+    var positionInfo: String? {
+        guard let xPath = (self.ancestors.reversed().filter{ $0.attached["xpath-barrier"] as? Bool == true }.first ?? self).xPathConsideringAttached else { return nil }
+        if xPath.hasPrefix("/") {
+            return " (\(xPath))"
+        } else {
+            return nil
+        }
     }
 }
 
 public extension Execution {
     
     func log(_ message: Message, node: XNode?, _ arguments: [String]) {
-        log(message, itemPositionInfo: itemPositionInfo(for: node), withArguments: arguments)
+        log(message, itemPositionInfo: node?.positionInfo, withArguments: arguments)
     }
     
     func log(_ message: Message, node: XNode?, _ arguments: String...) {
@@ -59,7 +61,7 @@ public extension Execution {
     }
     
     func log(setPIWithTarget piTarget: String?, _ message: Message, node: XNode?, _ arguments: [String]) {
-        let info = logAndUseInfo(message, itemPositionInfo: itemPositionInfo(for: node), withArguments: arguments)
+        let info = logAndUseInfo(message, itemPositionInfo: node?.positionInfo, withArguments: arguments)
         if let piTarget {
             (node as? XElement)?.addFirst { XProcessingInstruction(target: piTarget, data: "'\(info)'") }
         }
@@ -70,7 +72,7 @@ public extension Execution {
     }
     
     func logAndUseInfo(_ message: Message, node: XNode?, _ arguments: [String]) -> String {
-        logAndUseInfo(message, itemPositionInfo: itemPositionInfo(for: node), withArguments: arguments)
+        logAndUseInfo(message, itemPositionInfo: node?.positionInfo, withArguments: arguments)
     }
     
     func logAndUseInfo(_ message: Message, node: XNode?, _ arguments: String...) -> String {
