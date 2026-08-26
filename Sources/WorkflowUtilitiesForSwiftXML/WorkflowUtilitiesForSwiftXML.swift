@@ -45,12 +45,22 @@ public extension XElement {
     }
 }
 
+fileprivate extension String {
+    func prepending(_ prefix: String?) -> String {
+        if let prefix {
+            "\(prefix)\(self)"
+        } else {
+            self
+        }
+    }
+}
+
 public extension XNode {
     
     /// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath.
     var positionInfo: String? {
         guard let element = self.ancestors.reversed().filter({ $0.attached[elementInfoAttachmentName] as? Bool == true }).first ?? self as? XElement ?? self.parent else { return nil }
-        return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? "\(element)") in \(attached["context"] ?? "unknown context"))"
+        return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? element)\((attached["context"] as? String)?.prepending(" in ") ?? ""))"
     }
 }
 
