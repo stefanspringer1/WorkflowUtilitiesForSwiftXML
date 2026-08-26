@@ -17,6 +17,7 @@ public extension XElement {
     func setElementInfo(xPath: String? = nil, from other: XElement? = nil) {
         self.attached["xpath"] = xPath ?? self.attached["xpath"] ?? (other ?? self).xPathConsideringAttached
         self.attached["element"] = self.attached["element"] ?? "\(other ?? self)"
+        self.attached["context"] = self.attached["context"] ?? (other ?? self).ancestors({ $0["id"] != nil || $0["label"] != nil }).first?.description
     }
     
     func useForElementInfo() {
@@ -26,6 +27,7 @@ public extension XElement {
     func copyElementInfo(from other: XElement) {
         self.attached["xpath"] = other.attached["xpath"]
         self.attached["element"] = other.attached["element"]
+        self.attached["context"] = other.attached["context"]
         self.attached[elementInfoAttachmentName] = other.attached[elementInfoAttachmentName]
     }
     
@@ -48,7 +50,7 @@ public extension XNode {
     /// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath.
     var positionInfo: String? {
         guard let element = self.ancestors.reversed().filter({ $0.attached[elementInfoAttachmentName] as? Bool == true }).first ?? self as? XElement ?? self.parent else { return nil }
-        return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? "\(element)"))"
+        return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? "\(element)") in \(attached["context"] ?? "unknown context"))"
     }
 }
 
