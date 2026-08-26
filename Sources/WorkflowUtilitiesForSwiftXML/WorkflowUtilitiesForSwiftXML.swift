@@ -10,6 +10,10 @@ func positionInfo(forNode node: XNode?) -> String? {
 
 fileprivate let elementInfoAttachmentName = "element-info"
 
+fileprivate func isContext(_ element: XElement) -> Bool {
+    element["id"] != nil || element["label"] != nil
+}
+
 public extension XElement {
     
     /// Use this extension to `XElement` to set the attachments `xpath` and the element description to be used for error messages.
@@ -17,7 +21,7 @@ public extension XElement {
     func setElementInfo(xPath: String? = nil, from other: XElement? = nil) {
         self.attached["xpath"] = xPath ?? self.attached["xpath"] ?? (other ?? self).xPathConsideringAttached
         self.attached["element"] = self.attached["element"] ?? "\(other ?? self)"
-        self.attached["context"] = self.attached["context"] ?? (other ?? self).ancestors({ $0["id"] != nil || $0["label"] != nil }).first?.description
+        self.attached["context"] = self.attached["context"] ?? (other ?? self).ancestors({ isContext($0) }).first?.description
     }
     
     func useForElementInfo() {
@@ -60,7 +64,8 @@ public extension XNode {
     /// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath.
     var positionInfo: String? {
         guard let element = self.ancestors.reversed().filter({ $0.attached[elementInfoAttachmentName] as? Bool == true }).first ?? self as? XElement ?? self.parent else { return nil }
-        return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? element)\((attached["context"] as? String)?.prepending(" in ") ?? ""))"
+        let context: String? = if !isContext(element) { element.attached["context"] as? String ?? self.ancestors({ isContext($0) }).first?.description } else { nil }
+        return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? element)\((context?.prepending(" in ") ?? "")))"
     }
 }
 
