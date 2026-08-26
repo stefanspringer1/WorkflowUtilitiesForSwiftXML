@@ -16,12 +16,29 @@ fileprivate func isContext(_ element: XElement) -> Bool {
 
 public extension XElement {
     
+    var contextInfo: String? {
+        if self["id"] != nil {
+            return nil
+        }
+        if self["label"] != nil {
+            return self.ancestors({ $0["id"] != nil }).first?.description
+        }
+        guard let firstContext = self.ancestors({ $0["id"] != nil || $0["label"] != nil }).first else { return nil }
+        if firstContext["id"] != nil {
+            return firstContext.description
+        }
+        if let secondContext = firstContext.ancestors({ $0["id"] != nil }).first {
+            return "\(firstContext.description) in \(secondContext.description)"
+        }
+        return firstContext.description
+    }
+    
     /// Use this extension to `XElement` to set the attachments `xpath` and the element description to be used for error messages.
     /// If `useForElementInfo`, the XPath for any if its descendants will stop there.
     func setElementInfo(xPath: String? = nil, from other: XElement? = nil) {
         self.attached["xpath"] = xPath ?? self.attached["xpath"] ?? (other ?? self).xPathConsideringAttached
         self.attached["element"] = self.attached["element"] ?? "\(other ?? self)"
-        self.attached["context"] = self.attached["context"] ?? (other ?? self).ancestors({ isContext($0) }).first?.description
+        self.attached["context"] = self.attached["context"] ?? (other ?? self).contextInfo
     }
     
     func useForElementInfo() {
@@ -64,7 +81,7 @@ public extension XNode {
     /// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath.
     var positionInfo: String? {
         guard let element = self.ancestors.reversed().filter({ $0.attached[elementInfoAttachmentName] as? Bool == true }).first ?? self as? XElement ?? self.parent else { return nil }
-        let context: String? = if !isContext(element) { element.attached["context"] as? String ?? self.ancestors({ isContext($0) }).first?.description } else { nil }
+        let context = element.attached["context"] as? String ?? (self as? XElement ?? self.parent)?.contextInfo
         return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? element)\((context?.prepending(" in ") ?? "")))"
     }
 }
