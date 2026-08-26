@@ -11,7 +11,7 @@ func positionInfo(forNode node: XNode?) -> String? {
 fileprivate let elementInfoAttachmentName = "element-info"
 
 fileprivate func isContext(_ element: XElement) -> Bool {
-    element["id"] != nil || element["label"] != nil
+    element["id"] != nil
 }
 
 public extension XElement {
