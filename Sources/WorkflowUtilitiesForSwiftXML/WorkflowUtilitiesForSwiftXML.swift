@@ -36,7 +36,7 @@ public extension XElement {
     /// Use this extension to `XElement` to set the attachments `xpath` and the element description to be used for error messages.
     /// If `useForElementInfo`, the XPath for any if its descendants will stop there.
     func setElementInfo(xPath: String? = nil, from other: XElement? = nil) {
-        self.attached["xpath"] = xPath ?? self.attached["xpath"] ?? (other ?? self).xPathConsideringAttached
+        self.attached["xpath"] = xPath ?? (other ?? self).xPathConsideringAttached
         self.attached["element"] = self.attached["element"] ?? "\(other ?? self)"
         self.attached["context"] = self.attached["context"] ?? (other ?? self).contextInfo
     }
@@ -80,7 +80,7 @@ public extension XNode {
     
     /// The information about the position fo a node first searches for the attachment of name `xpath` for the XPath.
     var positionInfo: String? {
-        guard let element = self.ancestors.reversed().filter({ $0.attached[elementInfoAttachmentName] as? Bool == true }).first ?? self as? XElement ?? self.parent else { return nil }
+        guard let element = self.ancestorsIncludingSelf.filter({ $0.attached[elementInfoAttachmentName] as? Bool == true }).first ?? self as? XElement ?? self.parent else { return nil }
         let context = element.attached["context"] as? String ?? (self as? XElement ?? self.parent)?.contextInfo
         return "\(element.xPathConsideringAttached) (\(element.attached["element"] ?? element)\((context?.prepending(" in ") ?? "")))"
     }
